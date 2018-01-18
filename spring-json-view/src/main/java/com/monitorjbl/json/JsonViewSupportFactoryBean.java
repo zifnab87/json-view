@@ -1,5 +1,6 @@
 package com.monitorjbl.json;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -80,11 +81,31 @@ public class JsonViewSupportFactoryBean implements InitializingBean {
       int index = handlers.indexOf(handler);
       if(handler instanceof HttpEntityMethodProcessor) {
         handlers.set(index, new JsonViewHttpEntityMethodProcessor(converters));
-      } else if(handler instanceof RequestResponseBodyMethodProcessor) {
-        handlers.set(index, new JsonViewReturnValueHandler(converters, defaultView));
+      } else if(handler instanceof HandlerMethodReturnValueHandler) {
+        HandlerMethodReturnValueHandler valueHandler = handlers.get(index);
+        List<Object> responseBodyAdvice = (List<Object>) get(valueHandler,"advice");
+        HandlerMethodReturnValueHandler delegate = new JsonViewResponseProcessor(converters, responseBodyAdvice);
+        handlers.set(index, new JsonViewReturnValueHandler(delegate,  defaultView));
         break;
       }
     }
+  }
+
+  //reflection unfortunately
+  public static Object get(Object obj, String fieldName) {
+    Class<?> clazz = obj.getClass();
+    while (clazz != null) {
+      try {
+        Field field = clazz.getDeclaredField(fieldName);
+        field.setAccessible(true);
+        return field.get(obj);
+      } catch (NoSuchFieldException e) {
+        clazz = clazz.getSuperclass();
+      } catch (Exception e) {
+        throw new IllegalStateException(e);
+      }
+    }
+    return null;
   }
 
 

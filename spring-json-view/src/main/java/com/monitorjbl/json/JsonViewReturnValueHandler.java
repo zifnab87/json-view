@@ -16,8 +16,8 @@ public class JsonViewReturnValueHandler implements HandlerMethodReturnValueHandl
   private final HandlerMethodReturnValueHandler delegate;
   private final DefaultView defaultView;
 
-  public JsonViewReturnValueHandler(List<HttpMessageConverter<?>> converters, DefaultView defaultView) {
-    this.delegate = new JsonViewResponseProcessor(converters);
+  public JsonViewReturnValueHandler(HandlerMethodReturnValueHandler delegate, DefaultView defaultView) {
+    this.delegate = delegate;
     this.defaultView = defaultView;
   }
 
