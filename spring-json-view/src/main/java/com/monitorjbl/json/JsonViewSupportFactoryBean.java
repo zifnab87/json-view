@@ -81,9 +81,8 @@ public class JsonViewSupportFactoryBean implements InitializingBean {
       int index = handlers.indexOf(handler);
       if(handler instanceof HttpEntityMethodProcessor) {
         handlers.set(index, new JsonViewHttpEntityMethodProcessor(converters));
-      } else if(handler instanceof HandlerMethodReturnValueHandler) {
-        HandlerMethodReturnValueHandler valueHandler = handlers.get(index);
-        List<Object> responseBodyAdvice = (List<Object>) get(valueHandler,"advice");
+      } else if(handler instanceof RequestResponseBodyMethodProcessor) {
+        List<Object> responseBodyAdvice = (List<Object>) get(handler,"advice");
         HandlerMethodReturnValueHandler delegate = new JsonViewResponseProcessor(converters, responseBodyAdvice);
         handlers.set(index, new JsonViewReturnValueHandler(delegate,  defaultView));
         break;
