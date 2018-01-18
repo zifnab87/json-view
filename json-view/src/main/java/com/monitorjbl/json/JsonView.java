@@ -15,7 +15,7 @@ public class JsonView<T> {
     this.value = value;
   }
 
-  T getValue() {
+  public T getValue() {
     return value;
   }
 
